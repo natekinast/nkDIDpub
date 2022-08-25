@@ -1,8 +1,5 @@
 function setup() {
-    console.log("setup running");
-
     const makeyTheButtons = function(){
-        console.log("makey buttons running");
     /*
     1. Create a new button in GeoGebra and paste this code in the On Click script of the button
     2. Change the button script from GeoGebra Script to JavaScript
@@ -158,9 +155,7 @@ function setup() {
 
     if (ggbApplet.exists("buttonBar")) {
     alignButtons();
-    console.log("aligning buttons");
     } else {
-    console.log("creating buttons");
     createObjects();
     setLayers();
     evalCommandStuff();

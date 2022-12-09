@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="dist/reset.css">
+	<link rel="stylesheet" href="dist/reveal.css">
+	<link rel="stylesheet" href="dist/theme/black.css">
+  <script src="dist/reveal.js"></script>
+  <script src="script.js"></script>
+  <script src="https://www.geogebra.org/apps/deployggb.js"></script>
+  <script>  
+    var params = {"material_id": "anbmDpHv", "width": 915, "height": 469};
+    var applet = new GGBApplet(params, true);
+    window.addEventListener("load", function() { 
+        applet.inject('ggb-element');
+    });
+  </script>
+<title>Reveal Test</title>
+</head>
+
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <section>
+        <h2>DID Dreaming</h2>
+        <h4>with reveal.js</h4>
+      </section>
+
+      <section>
+        <h3><p class="fragment grow">Reveal.js</p> turns <span class="fragment highlight-green">HTML</span> into <span class="fragment highlight-green">slides</span></h3>
+      </section>
+      
+      <section>
+        <h2>Transition Styles</h2>
+        <p>
+          You can select from different transitions, like: <br>
+          <a href="?transition=none#/transitions">None</a> -
+          <a href="?transition=fade#/transitions">Fade</a> -
+          <a href="?transition=slide#/transitions">Slide</a> -
+          <a href="?transition=convex#/transitions">Convex</a> -
+          <a href="?transition=concave#/transitions">Concave</a> -
+          <a href="?transition=zoom#/transitions">Zoom</a>
+        </p>
+      </section>
+      
+      <section>
+        <section>Slides can nest vertically.</section>
+        <section>Like this.</section>
+        <section>And that.</section>
+      </section>
+      
+      <section>We can move over to the next slide at any time.</section>
+      
+      <section>
+        <section>Less Bynder, more Sharon.</section>
+        <section>
+          <div class="r-stack">
+            <img class="fragment" src="img/sharon1.jpg" style="height: 90%; width: auto">
+            <img class="fragment fade-in" src="img/sharon2.jpg" style="height: 70%; width: auto">
+            <img class="fragment fade-in" src="img/sharon3.jpg" style="height: 50%; width: auto">
+          </div>
+        </section>
+      </section>
+      
+      <section data-markdown>
+        <script type="text/template">
+          ## Markdown support
+
+          Write content using inline or external Markdown.
+
+          ```html [1|2-4|5]
+          <section data-markdown>
+            ## Markdown support
+
+            Write content using inline or external Markdown.
+          </section>
+          ```
+        </script>
+      </section>
+      
+      <section>
+        <section>Built in math support:</section>
+        <section>
+          \[\overline{a}_{x} = \frac{\Delta v_{x}}{\Delta t} = \frac{V_{f}-V_{i}}{t_{f}-t_{i}} \]
+        </section>
+        <section>
+          \[ P(x) = \dfrac{1}{\sigma \sqrt{2 \pi}} e^\frac{-(x - \mu)^{2}}{2\sigma^{2}} \]
+        </section>
+      </section>
+      
+      <section>
+        <p>Anything HTML can do</p>
+        <label for="testInput" style="font-size: 16pt;"><span class="fragment highlight-blue">Answer here:</span></label>
+        <input type="text" id="testInput" name="testInput">
+        <input type="submit" value="Submit">
+        <p>Reveal can do too</p>
+      </section>
+
+      <section>
+        <script src="//unpkg.com/mathlive"></script>
+        <div style="margin:auto;">
+        <h2>Options for math input</h2>
+        <math-field style="
+          font-size: larger;
+          border: 1px solid rgba(255,255,255,.8);
+          border-radius: 4px;
+          padding: 6px;
+        ">
+          x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+        </math-field>
+        <p class="fragment highlight-red" style="font-size: 12pt;">This here is using MathLive by CortexJS</p>
+        </div>
+      </section>
+      
+      <section>
+        <h2>Embed videos</h2>
+        <video data-autoplay src="media/bbb.mp4"></video>
+      </section>
+
+      <section>
+        <section><p>Here's a picture an AI generated when I described Sharon to it.</p></section>
+        <section><div><img src="img/sharon4.png" style="width:60%; height: auto"></div></section>
+      </section>
+      
+      <section>
+        <p class="fragment fade-down">And of course</p>
+        <p class="fragment fade-left">you can embed</p>
+        <p class="fragment fade-right">GeoGebra Applets</p>
+        <img class="fragment fade-up" src="img/ggb.png">
+      </section>
+      
+      <section>
+        <div id="ggb-element"></div>
+      </section>
+
+      <section>
+        <div><img src="img/thankyou.png" style="width:70%; height: auto;"></div>
+      </section>
+    
+    </div>
+  </div>
+
+  <script src="dist/reveal.js"></script>
+  <script src="plugin/markdown/markdown.js"></script>
+  <script src="plugin/highlight/highlight.js"></script>
+  <script src="plugin/zoom/zoom.js"></script>
+  <script src="plugin/math/math.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      disableLayout: false,
+
+      // Learn about plugins: https://revealjs.com/plugins/
+      plugins: [ RevealZoom, RevealMarkdown, RevealHighlight, RevealMath.KaTeX ]
+    });
+  </script>
+</body>
+</html>

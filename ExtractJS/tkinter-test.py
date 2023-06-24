@@ -42,69 +42,68 @@ class ExtractApp:
             state="disabled"
         )  # Initially disable the Extract button
 
-        self.status_label = tk.Label(
-            self.root,
-            textvariable=self.status_text,
-            bg="#424242",
-            fg="white",
-            font=("Arial", 10),
+        self.status_text = tk.Text(
+            self.root, bg="#424242", fg="white", font=("Arial", 10), width=50, height=10
         )
-        self.status_label.pack(pady=10)
+        self.status_text.pack(pady=10)
+        self.append_status("Status: Waiting for folder selection...")
+
+    def append_status(self, text):
+        self.status_text.insert(tk.END, text + "\n")
+        self.status_text.see(tk.END)  # Scroll to the end
 
     def choose_folder(self):
         # Open a folder selection dialog and update the folder_path
         folder_selected = filedialog.askdirectory()
         self.folder_path.set(folder_selected)
-        self.status_text.set("Status: Folder selected. Click 'Extract' to begin.")
+        self.append_status("Status: Folder selected. Click 'Extract' to begin.")
         self.extract_button.config(
             state="normal"
         )  # Enable the Extract button after folder selection
 
     def getJSFromGGB(self, root_path, fileName):
-        ggbFilePath = os.path.join(root_path, fileName)
-        ggbFileName = os.path.splitext(ggbFilePath)[0]
-        new_js_file_path = ggbFileName + "-globalJS.js"
+        ggb_file_path = os.path.join(root_path, fileName)
+        ggb_file_name = os.path.splitext(ggb_file_path)[0]
+        new_js_file_path = ggb_file_name + "-globalJS.js"
 
         if os.path.exists(new_js_file_path):
             return False
 
-        os.rename(ggbFilePath, ggbFileName + ".zip")
+        os.rename(ggb_file_path, ggb_file_name + ".zip")
 
-        with zipfile.ZipFile(ggbFileName + ".zip", "r") as zip_ref:
+        with zipfile.ZipFile(ggb_file_name + ".zip", "r") as zip_ref:
             zip_ref.extract("geogebra_javascript.js")
 
         os.rename("geogebra_javascript.js", new_js_file_path)
-        os.rename(ggbFileName + ".zip", ggbFilePath)
+        os.rename(ggb_file_name + ".zip", ggb_file_path)
 
         return True
 
     def extract_function(self):
         root_path = self.folder_path.get()
         ggb_files = [file for file in os.listdir(root_path) if file.endswith(".ggb")]
-        self.status_text.set("")
 
         for file in ggb_files:
             try:
                 success = self.getJSFromGGB(root_path, file)
                 if not success:
-                    self.status_text.set(
-                        self.status_text.get()
-                        + f"Extraction skipped for {file} as JavaScript file already exists.\n"
+                    self.append_status(
+                        f"Extraction skipped for {file} as JavaScript file already exists."
                     )
             except Exception as e:
-                self.status_text.set(
-                    self.status_text.get()
-                    + f"Error occurred while extracting {file}. Error: {str(e)}\n"
+                self.append_status(
+                    f"Error occurred while extracting {file}. Error: {str(e)}"
                 )
                 return  # if an error occurs, stop further extraction
 
-        self.status_text.set(self.status_text.get() + "Status: Extraction complete.")
+        self.append_status("Status: Extraction complete.")
 
 
 def main():
     root = tk.Tk()
-    root.geometry("400x200")
+    root.geometry("400x300")
     root.config(bg="#424242")
+    root.title("Extract JS from GGB")
     app = ExtractApp(root)
     root.mainloop()
 

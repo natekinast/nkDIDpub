@@ -28,17 +28,33 @@ class ExtractApp:
         )
         self.folder_label.pack(pady=10)
 
+        # Frame to hold "Extract" and "Sync" buttons
+        self.button_frame = tk.Frame(self.root, bg="#424242")
+        self.button_frame.pack(pady=10)
+
         # "Extract" button
         self.extract_button = tk.Button(
-            self.root,
+            self.button_frame,
             text="Extract",
             command=self.extract_function,
             bg="#424242",
             fg="white",
             font=("Arial", 10),
         )
-        self.extract_button.pack(pady=10)
+        self.extract_button.pack(side="left", padx=5)  # Add horizontal padding
         self.extract_button.config(state="disabled")
+
+        # "Sync" button
+        self.sync_button = tk.Button(
+            self.button_frame,
+            text="Sync",
+            command=self.sync_function,  # Function yet to be defined
+            bg="#424242",
+            fg="white",
+            font=("Arial", 10),
+        )
+        self.sync_button.pack(side="right", padx=5)  # Add horizontal padding
+        self.sync_button.config(state="disabled")
 
         # Text widget to display status
         self.status_text = tk.Text(
@@ -60,10 +76,11 @@ class ExtractApp:
             return
         self.append_status("Status: Folder selected. Click 'Extract' to begin.")
         self.extract_button.config(state="normal")
+        self.sync_button.config(state="normal")
 
-    def getJSFromGGB(self, root_path, fileName):
+    def get_JS_from_GGB(self, root_path, file_name):
         # Extract the JavaScript file from the GGB file
-        ggb_file_path = os.path.join(root_path, fileName)
+        ggb_file_path = os.path.join(root_path, file_name)
         ggb_file_name = os.path.splitext(ggb_file_path)[0]
         new_js_file_path = ggb_file_name + "-globalJS.js"
 
@@ -80,20 +97,54 @@ class ExtractApp:
 
         return True
 
+    def replace_file_in_zip(self, zip_path, target_file_name, replacement_file_path):
+        # Create a temporary zip file
+        temp_zip_path = zip_path + ".tmp"
+
+        with zipfile.ZipFile(zip_path, "r") as zin, zipfile.ZipFile(
+            temp_zip_path, "w"
+        ) as zout:
+            for item in zin.infolist():
+                if item.filename != target_file_name:
+                    # If the file is not the one to be replaced, copy it to the new zip
+                    zout.writestr(item, zin.read(item.filename))
+
+            # Add the replacement file
+            with open(replacement_file_path, "rb") as f:
+                data = f.read()
+            zout.writestr(target_file_name, data)
+
+        # Remove the original file and rename the temporary file
+        os.remove(zip_path)
+        os.rename(temp_zip_path, zip_path)
+
+    def sync_JS_to_GGB(self, root_path, file_name):
+        ggb_file_path = os.path.join(root_path, file_name)
+        ggb_file_name = os.path.splitext(ggb_file_path)[0]
+        js_file_path = os.path.join(root_path, ggb_file_name + "-globalJS.js")
+
+        os.rename(ggb_file_path, ggb_file_name + ".zip")
+
+        zip_file_path = os.path.join(root_path, ggb_file_name + ".zip")
+
+        self.replace_file_in_zip(zip_file_path, "geogebra_javascript.js", js_file_path)
+
+        os.rename(ggb_file_name + ".zip", ggb_file_path)
+        os.remove(js_file_path)
+
+        if os.path.exists(js_file_path):
+            return False
+
+        return True
+
     def extract_function(self):
         # Extract from all files in the selected folder
         root_path = self.folder_path.get()
-        if root_path is None or root_path == "":
-            self.append_status("Error: No folder selected.")
-            self.append_status("Status: Waiting for folder selection...")
-            self.extract_button.config(state="disabled")
-            return
-
         ggb_files = [file for file in os.listdir(root_path) if file.endswith(".ggb")]
 
         for file in ggb_files:
             try:
-                success = self.getJSFromGGB(root_path, file)
+                success = self.get_JS_from_GGB(root_path, file)
                 if not success:
                     self.append_status(
                         f"Extraction skipped for {file} as JavaScript file already exists."
@@ -105,6 +156,34 @@ class ExtractApp:
                 return
 
         self.append_status("Status: Extraction complete.")
+
+    def sync_function(self):
+        # Sync the extracted JS files with the GGB files
+
+        root_path = self.folder_path.get()
+        self.append_status(f"root_path: {root_path}")
+
+        ggbfiles = [file for file in os.listdir(root_path) if file.endswith(".ggb")]
+
+        for file in ggbfiles:
+            ggb_file_name = os.path.splitext(file)[0]
+            js_file_name = ggb_file_name + "-globalJS.js"
+            self.append_status(f"Checking for {js_file_name}...")
+            # Check if the JS file exists
+            if os.path.exists(os.path.join(root_path, js_file_name)):
+                try:
+                    success = self.sync_JS_to_GGB(root_path, file)
+                    if success:
+                        self.append_status(f"Sync successful for {file}.")
+                    else:
+                        self.append_status(
+                            f"Sync failed for {file}. JS file is still present."
+                        )
+                except Exception as e:
+                    self.append_status(
+                        f"Error occurred while syncing {file}. Error: {str(e)}"
+                    )
+                    return
 
 
 def main():

@@ -56,6 +56,8 @@ class ExtractApp:
         # Open a folder selection dialog and update the folder_path
         folder_selected = filedialog.askdirectory()
         self.folder_path.set(folder_selected)
+        if folder_selected is None or folder_selected == "":
+            return
         self.append_status("Status: Folder selected. Click 'Extract' to begin.")
         self.extract_button.config(state="normal")
 
@@ -81,6 +83,12 @@ class ExtractApp:
     def extract_function(self):
         # Extract from all files in the selected folder
         root_path = self.folder_path.get()
+        if root_path is None or root_path == "":
+            self.append_status("Error: No folder selected.")
+            self.append_status("Status: Waiting for folder selection...")
+            self.extract_button.config(state="disabled")
+            return
+
         ggb_files = [file for file in os.listdir(root_path) if file.endswith(".ggb")]
 
         for file in ggb_files:
@@ -104,7 +112,7 @@ def main():
     root = tk.Tk()
     root.geometry("400x300")
     root.config(bg="#424242")
-    root.title("Extract JS from GGB")
+    root.title("Extract JS from GGB files")
     app = ExtractApp(root)
     root.mainloop()
 

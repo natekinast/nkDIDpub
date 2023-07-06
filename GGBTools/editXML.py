@@ -112,19 +112,28 @@ class GGBToolsApp:
             zip_ref.extract("geogebra.xml")
         extracted_xml_path = os.path.join(os.path.dirname(file_path), "geogebra.xml")
         return extracted_xml_path
-    
+
     def xml_edit_test(self, file_path):
         if not file_path.endswith(".xml"):
             return
         tree = ET.parse(file_path)
         root = tree.getroot()
         euclidianView = root.find("euclidianView")
-        gridColor = euclidianView.find("gridColor") 
+        gridColor = euclidianView.find("gridColor")
         gridColor.set("r", "148")
         gridColor.set("g", "148")
         gridColor.set("b", "148")
         tree.write(file_path)
 
+    def go_function(self):
+        action_selected = self.action_var.get()
+        file_path = self.ggb_file_path.get()
+
+        if action_selected == "XML Test":
+            self.ggb_to_zip(file_path)
+
+        else:
+            self.append_status("Error: Invalid action selected.")
 
 
 def main():

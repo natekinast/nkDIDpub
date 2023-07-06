@@ -99,19 +99,30 @@ class GGBToolsApp:
         os.remove(zip_path)
         os.rename(temp_zip_path, zip_path)
 
-    def ggb_to_zip(self, file_path):
-        if not file_path.endswith(".ggb"):
-            return
-        zip_path = file_path[:-4] + ".zip"
-        os.rename(file_path, zip_path)
+    def ggb_to_xml(self, ggb_file_path):
+        dir = os.path.dirname(ggb_file_path)
 
-    def get_xml(self, file_path):
-        if not file_path.endswith(".zip"):
+        # Check if file path ends with .ggb
+        if not ggb_file_path.endswith(".ggb"):
+            self.append_status("Error: Invalid file type. Please provide a .ggb file.")
             return
-        with zipfile.ZipFile(file_path, "r") as zip_ref:
-            zip_ref.extract("geogebra.xml")
-        extracted_xml_path = os.path.join(os.path.dirname(file_path), "geogebra.xml")
-        return extracted_xml_path
+
+        # Rename .ggb file to .zip
+        zip_file_path = ggb_file_path[:-4] + ".zip"
+        os.rename(ggb_file_path, zip_file_path)
+
+        # Extract geogebra.xml from .zip
+        with zipfile.ZipFile(zip_file_path, "r") as zip_ref:
+            try:
+                zip_ref.extract("geogebra.xml", path=dir)
+            except KeyError:
+                self.append_status("Error: 'geogebra.xml' not found in the archive.")
+                return
+            else:
+                self.append_status("'geogebra.xml' extracted successfully.")
+
+        # Rename the .zip file back to .ggb if needed
+        return os.path.join(dir, "geogebra.xml")
 
     def xml_edit_test(self, file_path):
         if not file_path.endswith(".xml"):
@@ -125,12 +136,21 @@ class GGBToolsApp:
         gridColor.set("b", "148")
         tree.write(file_path)
 
+        ggb_file_path = self.ggb_file_path.get()
+        zip_file_path = ggb_file_path[:-4] + ".zip"
+
+        self.replace_file_in_zip(zip_file_path, "geogebra.xml", file_path)
+
+        os.rename(zip_file_path, ggb_file_path)
+        os.remove(file_path)
+
     def go_function(self):
         action_selected = self.action_var.get()
         file_path = self.ggb_file_path.get()
 
         if action_selected == "XML Test":
-            self.ggb_to_zip(file_path)
+            xml_path = self.ggb_to_xml(file_path)
+            self.xml_edit_test(xml_path)
 
         else:
             self.append_status("Error: Invalid action selected.")

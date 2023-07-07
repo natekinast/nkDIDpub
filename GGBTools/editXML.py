@@ -13,6 +13,12 @@ class GGBToolsApp:
         self.status_text = tk.StringVar()
         self.status_text.set("Status: Waiting for file selection...")
 
+        self.list_options = [
+            "Change Grid Color",
+            "Bold Axes",
+            "Set Line Opacity 100%",
+        ]
+
         # "Choose file" button
         self.choose_file_button = tk.Button(
             self.root,
@@ -34,16 +40,11 @@ class GGBToolsApp:
         self.button_frame = tk.Frame(self.root, bg="#424242")
         self.button_frame.pack(pady=10)
 
-        # Dropdown menu for actions
-        self.action_var = tk.StringVar(self.root)
-        self.action_var.set("Select action")
-        self.action_menu = tk.OptionMenu(
-            self.button_frame,
-            self.action_var,
-            "XML Test",
-        )
-        self.action_menu.config(bg="#424242", fg="white", font=("Arial", 10))
-        self.action_menu.pack(side="left", pady=10)
+        # Create Multi-select listbox
+        self.ms_listbox = tk.Listbox(root, selectmode=tk.MULTIPLE)
+        for option in self.list_options:
+            self.ms_listbox.insert(tk.END, option)
+        self.ms_listbox.pack(pady=10)
 
         # "Go" button
         self.go_button = tk.Button(
@@ -124,7 +125,7 @@ class GGBToolsApp:
         # Rename the .zip file back to .ggb if needed
         return os.path.join(dir, "geogebra.xml")
 
-    def xml_edit_test(self, file_path):
+    def change_grid_color(self, file_path):
         if not file_path.endswith(".xml"):
             return
         tree = ET.parse(file_path)
@@ -141,19 +142,50 @@ class GGBToolsApp:
 
         self.replace_file_in_zip(zip_file_path, "geogebra.xml", file_path)
 
+    def bold_axes(self, file_path):
+        if not file_path.endswith(".xml"):
+            return
+        tree = ET.parse(file_path)
+        root = tree.getroot()
+        euclidianView = root.find("euclidianView")
+        lineStyle = euclidianView.find("lineStyle")
+        lineStyle.set("axes", "3")
+        tree.write(file_path)
+
+        ggb_file_path = self.ggb_file_path.get()
+        zip_file_path = ggb_file_path[:-4] + ".zip"
+
+        self.replace_file_in_zip(zip_file_path, "geogebra.xml", file_path)
+
+    def cleanup(self):
+        ggb_file_path = self.ggb_file_path.get()
+        zip_file_path = ggb_file_path[:-4] + ".zip"
+        xml_file_path = os.path.join(os.path.dirname(ggb_file_path), "geogebra.xml")
         os.rename(zip_file_path, ggb_file_path)
-        os.remove(file_path)
+        os.remove(xml_file_path)
 
     def go_function(self):
-        action_selected = self.action_var.get()
         file_path = self.ggb_file_path.get()
+        xml_path = self.ggb_to_xml(file_path)
 
-        if action_selected == "XML Test":
-            xml_path = self.ggb_to_xml(file_path)
-            self.xml_edit_test(xml_path)
+        # Get list of currently selected items and run different functions based on selection
+        selected_items = self.ms_listbox.curselection()
+
+        if 0 in selected_items:
+            self.append_status("Changing grid color...")
+            self.change_grid_color(xml_path)
+
+        if 1 in selected_items:
+            self.append_status("Bolding axes...")
+            self.bold_axes(xml_path)
+
+        if 2 in selected_items:
+            self.set_line_opacity(xml_path)
 
         else:
-            self.append_status("Error: Invalid action selected.")
+            self.append_status("Error: Invalid selection.")
+
+        self.cleanup()
 
 
 def main():

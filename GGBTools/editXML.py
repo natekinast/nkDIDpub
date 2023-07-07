@@ -126,6 +126,7 @@ class GGBToolsApp:
         return os.path.join(dir, "geogebra.xml")
 
     def change_grid_color(self, file_path):
+        # Change grid color to RGB(148, 148, 148)
         if not file_path.endswith(".xml"):
             return
         tree = ET.parse(file_path)
@@ -143,6 +144,7 @@ class GGBToolsApp:
         self.replace_file_in_zip(zip_file_path, "geogebra.xml", file_path)
 
     def bold_axes(self, file_path):
+        # Make axes bold
         if not file_path.endswith(".xml"):
             return
         tree = ET.parse(file_path)
@@ -157,7 +159,27 @@ class GGBToolsApp:
 
         self.replace_file_in_zip(zip_file_path, "geogebra.xml", file_path)
 
+    def set_line_opacity(self, file_path):
+        # Change opacity to 100% for lines, segments, rays, and vectors
+        if not file_path.endswith(".xml"):
+            return
+        tree = ET.parse(file_path)
+        root = tree.getroot()
+        types = ["segment", "line", "ray", "vector"]
+        construction = root.find("construction")
+        for element in construction:
+            if element.tag == "element":
+                if element.get("type") in types:
+                    element.find("lineStyle").set("opacity", "255")
+        tree.write(file_path)
+
+        ggb_file_path = self.ggb_file_path.get()
+        zip_file_path = ggb_file_path[:-4] + ".zip"
+
+        self.replace_file_in_zip(zip_file_path, "geogebra.xml", file_path)
+
     def cleanup(self):
+        # Rename the zip file back to ggb and remove xml file
         ggb_file_path = self.ggb_file_path.get()
         zip_file_path = ggb_file_path[:-4] + ".zip"
         xml_file_path = os.path.join(os.path.dirname(ggb_file_path), "geogebra.xml")

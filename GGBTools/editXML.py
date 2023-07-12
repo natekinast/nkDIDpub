@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import filedialog
 import os
 import zipfile
-import sys
 import xml.etree.ElementTree as ET
 
 
@@ -185,6 +184,7 @@ class GGBToolsApp:
         xml_file_path = os.path.join(os.path.dirname(ggb_file_path), "geogebra.xml")
         os.rename(zip_file_path, ggb_file_path)
         os.remove(xml_file_path)
+        self.append_status("Done.")
 
     def go_function(self):
         file_path = self.ggb_file_path.get()
@@ -213,7 +213,7 @@ class GGBToolsApp:
 def main():
     # Create the GUI
     root = tk.Tk()
-    root.geometry("400x300")
+    root.geometry("400x500")
     root.config(bg="#424242")
     root.title("GGB Tools")
     app = GGBToolsApp(root)

@@ -1,4 +1,4 @@
-function textResizer(name) {
+function testResizer(name) {
   const parentdiv = document.getElementById(name);
   if (parentdiv !== null) {
     const oldWidth = parentdiv.offsetWidth;

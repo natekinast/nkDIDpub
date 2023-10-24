@@ -1,4 +1,5 @@
 function testResizer(name) {
+  console.log("testResizer called");
   const parentdiv = document.getElementById(name);
   if (parentdiv !== null) {
     const oldWidth = parentdiv.offsetWidth;

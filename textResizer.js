@@ -1,4 +1,4 @@
-function textResizer() {
+function textResizer(name, ggbObject) {
   console.log("textResizer called");
   const parentdiv = document.getElementById(name);
   if (parentdiv !== null) {

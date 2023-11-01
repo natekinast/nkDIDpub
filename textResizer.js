@@ -1,5 +1,5 @@
 function textResizer() {
-  console.log("testResizer called");
+  console.log("textResizer called");
   const parentdiv = document.getElementById(name);
   if (parentdiv !== null) {
     const oldWidth = parentdiv.offsetWidth;
@@ -38,3 +38,5 @@ function textResizer() {
     });
   }
 }
+
+return textResizer;

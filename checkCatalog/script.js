@@ -20,8 +20,8 @@ function handleSubmit() {
   }
 
   const spinner = document.getElementById("spinner");
-
   spinner.style.display = "inline-block";
+  resultsArea.innerText = "Checking IDs, this may take a few seconds...";
 
   getGGBIDs(url).then((lessonIDs) => {
     getCatalogIDs().then((catalogIDs) => {
